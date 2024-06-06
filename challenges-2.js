@@ -55,7 +55,8 @@ const filterNullForProperty = (data, property) => {
 // You need to remove any missing values because n + undefined = NaN!
 
 const sumAllProperty = (data, property) => {
-  return 0;
+  values = data.filter((p) => p.fields[property] != undefined);
+  return values.reduce((acc, val) => acc + val.fields[property], 0);
 };
 
 // 5 -------------------------------------------------------------
@@ -69,7 +70,15 @@ const sumAllProperty = (data, property) => {
 // at Cherbourg, 77 emabrked at Queenstown, and 2 are undedfined
 
 const countAllProperty = (data, property) => {
-  return {};
+  const counts = data.reduce((acc, val) => {
+    if (acc[val.fields[property]] === undefined) {
+      acc[val.fields[property]] = 1;
+    } else {
+      acc[val.fields[property]] += 1;
+    }
+    return acc;
+  }, {});
+  return counts;
 };
 
 // Use reduce with an object as the starting accumulator!
@@ -83,7 +92,16 @@ const countAllProperty = (data, property) => {
 // ages 0 - 10, 10 - 20, 20 - 30 etc.
 
 const makeHistogram = (data, property, step) => {
-  return [];
+  definedValues = data.filter((p) => p.fields[property] !== undefined);
+  const histogram = definedValues.reduce((acc, val) => {
+    if (acc[Math.floor(val.fields[property] / step)] === undefined) {
+      acc[Math.floor(val.fields[property] / step)] = 1;
+    } else {
+      acc[Math.floor(val.fields[property] / step)] += 1;
+    }
+    return acc;
+  }, []);
+  return Array.from(histogram, (item) => item || 0);
 };
 
 // Note! There may not be no values for a particular step. For example
@@ -102,7 +120,12 @@ const makeHistogram = (data, property, step) => {
 // to divide each value by the maximum value in the array.
 
 const normalizeProperty = (data, property) => {
-  return [];
+  const values = data
+    .filter((p) => p.fields[property] !== undefined)
+    .map((p) => p.fields[property]);
+  const maxValue = Math.max(...values);
+  const normalizedValues = values.map((value) => value / maxValue);
+  return normalizedValues;
 };
 
 // Normalizing is an important process that can make many other
@@ -122,7 +145,11 @@ const normalizeProperty = (data, property) => {
 // would return ['male', 'female']
 
 const getUniqueValues = (data, property) => {
-  return [];
+  const array = data
+    .filter((p) => p.fields[property] !== undefined)
+    .map((p) => p.fields[property]);
+  const uniqueValues = new Set(array);
+  return Array.from(uniqueValues, String);
 };
 
 // There are a couple ways to do this.
